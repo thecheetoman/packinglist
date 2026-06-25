@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Items</h2>
+  <p>Anyone can check/uncheck items.</p>
+  <div>
+    {% for item in items %}
+      <div class="item {% if item.checked %}checked{% endif %}">
+        <strong>{{item.tool}}</strong>
+        {% if item.quantity %} — {{item.quantity}}{% endif %}
+        <div>{{item.where_to_put}}</div>
+        <div style="font-size:0.9em;color:#555">Find: {{item.where_to_find}}</div>
+        <form class="inline" action="/toggle/{{item.id}}" method="post">
+          <button type="submit">{% if item.checked %}Uncheck{% else %}Check{% endif %}</button>
+        </form>
+      </div>
+    {% else %}
+      <p>No items yet.</p>
+    {% endfor %}
+  </div>
+{% endblock %}

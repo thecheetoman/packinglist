@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Checklist</title>
+    <style>
+      body{font-family: Arial, sans-serif; max-width:900px;margin:20px auto;padding:0 16px}
+      header{display:flex;justify-content:space-between;align-items:center}
+      .item{border-bottom:1px solid #eee;padding:8px 0}
+      .checked{opacity:0.6;text-decoration:line-through}
+      form.inline{display:inline}
+      .flash{padding:8px;border-radius:4px;margin:8px 0}
+      .flash.error{background:#ffe6e6}
+      .flash.success{background:#e6ffe6}
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1><a href="/">Checklist</a></h1>
+      <nav>
+        <a href="/admin">Admin</a>
+        <a href="/admin/logout" style="margin-left:8px">Logout</a>
+      </nav>
+    </header>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for cat, msg in messages %}
+          <div class="flash {{cat}}">{{msg}}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </body>
+</html>
