@@ -2,13 +2,14 @@ import os
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import text
 from functools import wraps
 
 app = Flask(__name__, instance_relative_config=True)
 os.makedirs(app.instance_path, exist_ok=True)
-db_path = os.path.join(app.instance_path, 'checklist.db')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    'DATABASE_URL',
+    'sqlite:///' + os.path.join(app.instance_path, 'checklist.db')
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET', 'dev-secret')
 ADMIN_PASSWORD = os.environ.get('CHECKLIST_ADMIN_PW', 'changeme')
@@ -51,44 +52,17 @@ class Part(db.Model):
 _db_initialized = False
 
 
-def migrate_db():
+def init_db():
     global _db_initialized
     if _db_initialized:
         return
-    import sqlalchemy as sa
-    inspector = sa.inspect(db.engine)
-    tables = inspector.get_table_names()
-
-    if 'user' not in tables:
-        db.create_all()
-        _db_initialized = True
-        return
-
-    user_columns = [c['name'] for c in inspector.get_columns('user')]
-    if 'password_hash' in user_columns:
-        db.session.execute(text('CREATE TABLE user_new (id INTEGER PRIMARY KEY, username VARCHAR(80) UNIQUE NOT NULL)'))
-        db.session.execute(text('INSERT INTO user_new (id, username) SELECT id, username FROM user'))
-        db.session.execute(text('DROP TABLE user'))
-        db.session.execute(text('ALTER TABLE user_new RENAME TO user'))
-        db.session.commit()
-
-    item_columns = [c['name'] for c in inspector.get_columns('item')]
-    if 'checked_by' not in item_columns:
-        db.session.execute(text('ALTER TABLE item ADD COLUMN checked_by VARCHAR(80)'))
-        db.session.commit()
-    if 'location' not in item_columns:
-        db.session.execute(text('ALTER TABLE item ADD COLUMN location VARCHAR(100)'))
-        db.session.commit()
-
-    if 'part' not in tables:
-        db.create_all()
-
+    db.create_all()
     _db_initialized = True
 
 
 @app.before_request
 def ensure_db():
-    migrate_db()
+    init_db()
 
 
 def login_required(f):

@@ -1,4 +1,4 @@
-# Packing List Checklist ts read me by ai
+# Packing List Checklist
 
 A Flask web app for managing a packing checklist with two modes: **Tools** and **Screws & Parts**. Users sign in with a username and check off items. Leads (admins) add and manage items via a password-protected panel.
 
@@ -69,75 +69,76 @@ LOCATIONS = ['Drawer 1', 'Drawer 2', 'Drawer 3', 'Shelf A', 'Shelf B',
              'Cabinet', 'Closet', 'Under Bed', 'Other']
 ```
 
-## Hosting the Website
+## Hosting on Render (Free Tier)
 
-### Option A: PythonAnywhere (easiest — free tier works)
+### Why PostgreSQL?
+Render's filesystem is **ephemeral** — your SQLite database would reset on every deploy or after 15 minutes of inactivity (free tier). Switching to **PostgreSQL** keeps your data safe across restarts. Render's free PostgreSQL tier (1 GB) is plenty for this app.
 
-1. Create an account at https://www.pythonanywhere.com.
-2. Go to the **Dashboard &rarr; Files** tab and upload your project files (or clone from GitHub).
-3. Go to **Dashboard &rarr; Web** and **Add a new web app**.
-   - Choose **Manual configuration**, then **Python 3.x**.
-4. In the **Code** section:
-   - Set **Source code** to the path of your project folder (e.g. `/home/yourname/packinglist`).
-   - Set **Working directory** to the same path.
-5. Install dependencies by opening a **Bash console** and running:
-   ```bash
-   pip install --user -r /home/yourname/packinglist/requirements.txt
-   ```
-6. Create a WSGI file — click the **WSGI configuration file** link and replace its contents with:
-   ```python
-   import sys
-   sys.path.insert(0, '/home/yourname/packinglist')
-   from app import app as application
-   ```
-7. In the **Environment variables** section (under Web), add:
-   - `CHECKLIST_ADMIN_PW` = your admin password
-   - `FLASK_SECRET` = a random secret string
-8. **Reload** your web app from the green button.
-9. Upload your location images to `static/images/locations/` via the Files tab.
-
-### Option B: Railway / Render / Fly.io (cheap paid)
-
-These platforms deploy from a GitHub repo. You'll need a `requirements.txt` (already included) and a `Procfile` for some of them:
-
-Create a `Procfile`:
-```
-web: gunicorn app:app
-```
-
-If deploying, add `gunicorn` to `requirements.txt`:
-```
-gunicorn==23.0.0
-```
-
-Then connect your GitHub repo to the platform and set the environment variables (`CHECKLIST_ADMIN_PW`, `FLASK_SECRET`) in their dashboard.
-
-### Option C: VPS (DigitalOcean, Linode, etc.)
+### Step 1: Push to GitHub
 
 ```bash
-# SSH into your server
-git clone https://github.com/yourname/packinglist.git
-cd packinglist
-
-# Set up Python
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-pip install gunicorn
-
-# Run with Gunicorn
-gunicorn -w 4 -b 0.0.0.0:8000 app:app
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/YOUR_USERNAME/packinglist.git
+git push -u origin main
 ```
 
-Use a reverse proxy (nginx / Caddy) to serve the app on port 80/443.
+### Step 2: Create a PostgreSQL Database
+
+1. Go to https://dashboard.render.com and click **New +** → **PostgreSQL**.
+2. Fill in:
+   - **Name**: `packinglist-db`
+   - **Database**: `packinglist` (or leave default)
+   - **User**: `packinglist` (or leave default)
+   - **Region**: pick one close to you
+3. Click **Create Database**.
+4. Once created, copy the **Internal Database URL** (starts with `postgres://...`). You'll need this in the next step.
+
+### Step 3: Deploy the Web Service
+
+1. On the Render dashboard, click **New +** → **Web Service**.
+2. Connect your GitHub repository.
+3. Fill in:
+   - **Name**: `packinglist`
+   - **Region**: same as your database
+   - **Branch**: `main`
+   - **Runtime**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn app:app`
+   - **Instance Type**: **Free**
+4. Click **Create Web Service**.
+
+### Step 4: Set Environment Variables
+
+After creation, go to your web service's **Environment** tab and add:
+
+| Variable             | Value                        |
+|----------------------|------------------------------|
+| `DATABASE_URL`       | Paste the **Internal Database URL** from step 2 |
+| `CHECKLIST_ADMIN_PW` | Your admin password           |
+| `FLASK_SECRET`       | A random secret string        |
+
+### Step 5: Deploy & Verify
+
+Click **Manual Deploy** → **Deploy latest commit**. Wait for the build to finish, then visit the `.onrender.com` URL.
+
+Your data will persist across restarts, spin-downs, and redeploys.
+
+### Adding Location Pictures on Render
+
+Upload images to `static/images/locations/` via the Render dashboard's **Shell** tab or include them in your repo (place them in `static/images/locations/` before pushing).
 
 ## Environment Variables
 
-| Variable             | Default      | Description                          |
-|----------------------|--------------|--------------------------------------|
-| `CHECKLIST_ADMIN_PW` | `changeme`   | Password for the Leads admin panel   |
-| `FLASK_SECRET`       | `dev-secret` | Flask session secret (set a real one) |
+| Variable             | Default                           | Description                          |
+|----------------------|-----------------------------------|--------------------------------------|
+| `DATABASE_URL`       | `sqlite:///instance/checklist.db` | PostgreSQL connection string         |
+| `CHECKLIST_ADMIN_PW` | `changeme`                        | Password for the Leads admin panel   |
+| `FLASK_SECRET`       | `dev-secret`                      | Flask session secret (set a real one) |
 
 ## Database
 
-SQLite database is stored at `instance/checklist.db`. It is created and migrated automatically on first run. No manual setup needed.
+- **Locally**: SQLite at `instance/checklist.db` (auto-created).
+- **On Render**: PostgreSQL via `DATABASE_URL` environment variable.
+- Tables are created automatically on first run. No manual setup needed.
