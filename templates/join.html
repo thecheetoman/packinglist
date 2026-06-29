@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Join</h2>
+  <p>Enter a username to join.</p>
+  <form method="post">
+    <div>
+      <label>Username<br><input name="username" required autofocus></label>
+    </div>
+    <div style="margin-top:8px">
+      <button type="submit">Go</button>
+    </div>
+  </form>
+{% endblock %}
