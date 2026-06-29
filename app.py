@@ -13,6 +13,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET', 'dev-secret')
 ADMIN_PASSWORD = os.environ.get('CHECKLIST_ADMIN_PW', 'changeme')
 
+# IMPORTANT
 LOCATIONS = ['Drawer 1', 'Drawer 2', 'Drawer 3', 'Shelf A', 'Shelf B', 'Cabinet', 'Closet', 'Under Bed', 'Other']
 
 db = SQLAlchemy(app)
