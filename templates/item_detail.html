@@ -1,31 +1,35 @@
 {% extends 'base.html' %}
 {% block content %}
-  <p><a href="/">&larr; Back</a></p>
+<a href="/" class="back-link">&larr; Back</a>
 
+<div class="detail-hero">
   <h2>{{ item.tool }}</h2>
+</div>
 
-  {% if item.location %}
-    <div style="margin:16px 0;padding:16px;border:2px dashed #ccc;border-radius:8px;text-align:center;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fafafa">
-      {% if location_image %}
-        <img src="{{ url_for('static', filename=location_image) }}" alt="{{ item.location }}" style="max-width:100%;max-height:300px;border-radius:4px">
-      {% else %}
-        <div style="font-size:2em;font-weight:bold;color:#555">{{ item.location }}</div>
-        <div style="margin-top:8px;font-size:0.85em;color:#999">Drop a picture in <code>static/images/locations/</code></div>
-      {% endif %}
-    </div>
+{% if item.location %}
+<div class="location-box">
+  {% if location_image %}
+    <img src="{{ url_for('static', filename=location_image) }}" alt="{{ item.location }}">
+  {% else %}
+    <div class="location-placeholder">{{ item.location }}</div>
+    <div class="location-hint">Drop a picture in <code>static/images/locations/</code></div>
   {% endif %}
+</div>
+{% endif %}
 
-  <table style="width:100%;border-collapse:collapse">
-    <tr><td style="padding:6px 12px 6px 0;font-weight:bold;white-space:nowrap">Quantity</td><td>{{ item.quantity or '—' }}</td></tr>
-    <tr><td style="padding:6px 12px 6px 0;font-weight:bold;white-space:nowrap">Where to put</td><td>{{ item.location or item.where_to_put or '—' }}</td></tr>
-    <tr><td style="padding:6px 12px 6px 0;font-weight:bold;white-space:nowrap">Where to find</td><td>{{ item.where_to_find or '—' }}</td></tr>
-    <tr><td style="padding:6px 12px 6px 0;font-weight:bold;white-space:nowrap">Status</td>
+<div class="detail-card">
+  <table class="detail-table">
+    <tr><td>Quantity</td><td>{{ item.quantity or '—' }}</td></tr>
+    <tr><td>Where to put</td><td>{{ item.location or item.where_to_put or '—' }}</td></tr>
+    <tr><td>Where to find</td><td>{{ item.where_to_find or '—' }}</td></tr>
+    <tr><td>Status</td>
       <td>{% if item.checked %}Checked by {{ item.checked_by }}{% else %}Not checked{% endif %}</td></tr>
   </table>
+</div>
 
-  {% if not session.get('admin') %}
-    <form class="inline" action="/toggle/{{item.id}}" method="post" style="margin-top:16px;display:block">
-      <button type="submit">{% if item.checked %}Uncheck{% else %}Check{% endif %}</button>
-    </form>
-  {% endif %}
+{% if not session.get('admin') %}
+  <form action="/toggle/{{item.id}}" method="post" style="margin-top:16px">
+    <button type="submit" class="btn btn-yellow">{% if item.checked %}Uncheck{% else %}Check{% endif %}</button>
+  </form>
+{% endif %}
 {% endblock %}

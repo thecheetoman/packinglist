@@ -1,57 +1,90 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="admin-page">
+  <h2>Leads</h2>
 
-<h2>Leads</h2>
-
-<form action="/leads/reset" method="post" onsubmit="return confirm('Delete all tools and parts? Usernames will be kept.')" style="margin-bottom:12px">
-  <button type="submit" style="background:#c00;color:#fff;border:none;padding:6px 14px;border-radius:4px;cursor:pointer">Reset All Data</button>
-</form>
-
-<div style="display:flex;gap:32px;flex-wrap:wrap">
-  <div style="flex:1;min-width:280px">
-    <h3>Add Tool</h3>
-    <form method="post">
-      <input type="hidden" name="kind" value="tool">
-      <div><label>Name<br><input name="tool" required></label></div>
-      <div><label>Where to put<br>
-        <select name="location" style="width:100%;padding:4px">
-          <option value="">— Select —</option>
-          {% for loc in locations %}<option value="{{ loc }}">{{ loc }}</option>{% endfor %}
-        </select></label></div>
-      <div><label>Where to find<br><input name="where_to_find"></label></div>
-      <div><label>Quantity<br><input name="quantity"></label></div>
-      <div style="margin-top:8px"><button type="submit">Add Tool</button></div>
+  <div class="admin-toolbar">
+    <form action="/leads/reset" method="post" onsubmit="return confirm('Delete all tools and parts? Usernames will be kept.')">
+      <button type="submit" class="btn btn-danger">Reset All Data</button>
     </form>
   </div>
 
-  <div style="flex:1;min-width:280px">
-    <h3>Add Screw / Part</h3>
-    <form method="post">
-      <input type="hidden" name="kind" value="part">
-      <div><label>Name<br><input name="tool" required></label></div>
-      <div><label>Where to put<br>
-        <select name="location" style="width:100%;padding:4px">
-          <option value="">— Select —</option>
-          {% for loc in locations %}<option value="{{ loc }}">{{ loc }}</option>{% endfor %}
-        </select></label></div>
-      <div><label>Where to find<br><input name="where_to_find"></label></div>
-      <div><label>Quantity<br><input name="quantity"></label></div>
-      <div style="margin-top:8px"><button type="submit">Add Part</button></div>
-    </form>
+  <div class="admin-grid">
+    <div class="admin-card">
+      <h3>Add Tool</h3>
+      <form method="post">
+        <input type="hidden" name="kind" value="tool">
+        <div class="form-group">
+          <label>Name</label>
+          <input class="form-input" name="tool" required>
+        </div>
+        <div class="form-group">
+          <label>Where to put</label>
+          <select class="form-select" name="location">
+            <option value="">— Select —</option>
+            {% for loc in locations %}<option value="{{ loc }}">{{ loc }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Where to find</label>
+          <input class="form-input" name="where_to_find">
+        </div>
+        <div class="form-group">
+          <label>Quantity</label>
+          <input class="form-input" name="quantity">
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-yellow">Add Tool</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="admin-card">
+      <h3>Add Screw / Part</h3>
+      <form method="post">
+        <input type="hidden" name="kind" value="part">
+        <div class="form-group">
+          <label>Name</label>
+          <input class="form-input" name="tool" required>
+        </div>
+        <div class="form-group">
+          <label>Where to put</label>
+          <select class="form-select" name="location">
+            <option value="">— Select —</option>
+            {% for loc in locations %}<option value="{{ loc }}">{{ loc }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Where to find</label>
+          <input class="form-input" name="where_to_find">
+        </div>
+        <div class="form-group">
+          <label>Quantity</label>
+          <input class="form-input" name="quantity">
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-yellow">Add Part</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="lead-list">
+    <h3>Existing Tools</h3>
+    <ul>
+      {% for it in items %}
+        <li><a href="/item/{{it.id}}">{{it.tool}}</a> — {{it.quantity}} — {% if it.location %}<strong>{{it.location}}</strong>{% endif %} {{it.where_to_put}} — {{it.where_to_find}}</li>
+      {% else %}<li style="color:var(--neutral-700)">No tools</li>{% endfor %}
+    </ul>
+  </div>
+
+  <div class="lead-list">
+    <h3>Existing Screws &amp; Parts</h3>
+    <ul>
+      {% for p in parts %}
+        <li><a href="/item/{{p.id}}">{{p.tool}}</a> — {{p.quantity}} — {% if p.location %}<strong>{{p.location}}</strong>{% endif %} {{p.where_to_put}} — {{p.where_to_find}}</li>
+      {% else %}<li style="color:var(--neutral-700)">No parts</li>{% endfor %}
+    </ul>
   </div>
 </div>
-
-<h3 style="margin-top:24px">Existing Tools</h3>
-<ul>
-  {% for it in items %}
-    <li><a href="/item/{{it.id}}">{{it.tool}}</a> — {{it.quantity}} — {% if it.location %}<strong>{{it.location}}</strong>{% endif %} {{it.where_to_put}} — {{it.where_to_find}}</li>
-  {% else %}<li>No tools</li>{% endfor %}
-</ul>
-
-<h3>Existing Screws &amp; Parts</h3>
-<ul>
-  {% for p in parts %}
-    <li><a href="/item/{{p.id}}">{{p.tool}}</a> — {{p.quantity}} — {% if p.location %}<strong>{{p.location}}</strong>{% endif %} {{p.where_to_put}} — {{p.where_to_find}}</li>
-  {% else %}<li>No parts</li>{% endfor %}
-</ul>
 {% endblock %}

@@ -1,13 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="form-card">
   <h2>Join</h2>
   <p>Enter a username to join.</p>
   <form method="post">
-    <div>
-      <label>Username<br><input name="username" required autofocus></label>
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input class="form-input" id="username" name="username" required autofocus>
     </div>
-    <div style="margin-top:8px">
-      <button type="submit">Go</button>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-yellow">Go</button>
     </div>
   </form>
+</div>
 {% endblock %}

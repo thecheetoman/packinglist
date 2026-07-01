@@ -1,13 +1,16 @@
 {% extends 'base.html' %}
-
 {% block content %}
-  <h2>Leads login</h2>
+<div class="form-card">
+  <h2>Leads Login</h2>
+  <p>Enter the admin password.</p>
   <form method="post">
-    <div>
-      <label>Password<br><input type="password" name="password"></label>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input class="form-input" id="password" type="password" name="password">
     </div>
-    <div style="margin-top:8px">
-      <button type="submit">Login</button>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-yellow">Login</button>
     </div>
   </form>
+</div>
 {% endblock %}

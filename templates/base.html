@@ -3,56 +3,62 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Checklist</title>
-    <style>
-      body{font-family: Arial, sans-serif; max-width:900px;margin:20px auto;padding:0 16px}
-      header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
-      .item{border-bottom:1px solid #eee;padding:8px 0}
-      .checked{opacity:0.6;text-decoration:line-through}
-      form.inline{display:inline}
-      .flash{padding:8px;border-radius:4px;margin:8px 0}
-      .flash.error{background:#ffe6e6}
-      .flash.success{background:#e6ffe6}
-    </style>
+    <title>Checklist — Σ-Motion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   </head>
   <body>
-    <header>
-      <h1>
-        {% if session.username %}
-        <form action="/mode" method="post" style="display:inline">
-          <select name="mode" onchange="this.form.submit()" style="font-size:1em;padding:2px 4px">
-            <option value="tools" {% if session.get('mode','tools')=='tools' %}selected{% endif %}>Tools</option>
-            <option value="parts" {% if session.get('mode','tools')=='parts' %}selected{% endif %}>Screws &amp; Parts</option>
-          </select>
-        </form>
-        {% else %}
-          Checklist
-        {% endif %}
-      </h1>
-      <nav>
-        {% if session.username %}
-          {% if session.get('admin') %}
-            <span style="font-weight:bold;color:#c00">BUILD LEAD MODE</span>
-          {% else %}
-            <span>{{ session.username }}</span>
+    <div class="container">
+      <header class="navbar">
+        <a href="/" class="navbar-brand">&#x2211;-Motion Packing</a>
+        <div class="navbar-right">
+          {% if session.username %}
+            <form action="/mode" method="post" style="display:inline">
+              <select name="mode" class="mode-select" onchange="this.form.submit()">
+                <option value="tools" {% if session.get('mode','tools')=='tools' %}selected{% endif %}>Tools</option>
+                <option value="parts" {% if session.get('mode','tools')=='parts' %}selected{% endif %}>Screws &amp; Parts</option>
+              </select>
+            </form>
+            {% if session.get('admin') %}
+              <span class="nav-badge">BUILD LEAD MODE</span>
+            {% else %}
+              <span class="nav-user">{{ session.username }}</span>
+            {% endif %}
+            <a href="/logout" class="nav-link">Logout</a>
+            {% if session.get('admin') %}
+              <a href="/leads" class="nav-link">Leads</a>
+              <a href="/leads/logout" class="nav-link">Exit lead mode</a>
+            {% else %}
+              <a href="/leads/login" class="nav-link">Leads</a>
+            {% endif %}
           {% endif %}
-          <a href="/logout" style="margin-left:8px">Logout</a>
-          {% if session.get('admin') %}
-            <a href="/leads" style="margin-left:8px">Leads</a>
-            <a href="/leads/logout" style="margin-left:8px">Exit lead mode</a>
-          {% else %}
-            <a href="/leads/login" style="margin-left:8px">Leads</a>
-          {% endif %}
+        </div>
+      </header>
+    </div>
+
+    <hr class="sigma-hr">
+
+    <div class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for cat, msg in messages %}
+            <div class="flash {{cat}}">{{msg}}</div>
+          {% endfor %}
         {% endif %}
-      </nav>
-    </header>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for cat, msg in messages %}
-          <div class="flash {{cat}}">{{msg}}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-    {% block content %}{% endblock %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </div>
+
+    <hr class="sigma-hr">
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-brand">&#x2211;-Motion Packing Checklist</div>
+        <div class="footer-sub">FRC Team 2658 style</div>
+      </div>
+    </footer>
   </body>
 </html>
