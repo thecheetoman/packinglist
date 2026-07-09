@@ -60,5 +60,13 @@
         <div class="footer-sub">lowk made by sircheetodust</div>
       </div>
     </footer>
+  <script>
+    let lastTs = {{ last_updated|default(0) }};
+    setInterval(function() {
+      fetch('/api/updated').then(function(r) { return r.json(); }).then(function(d) {
+        if (d.ts && d.ts !== lastTs) { lastTs = d.ts; location.reload(); }
+      });
+    }, 5000);
+  </script>
   </body>
 </html>

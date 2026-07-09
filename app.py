@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 
@@ -61,6 +61,24 @@ def init_db():
         return
     db.create_all()
     _db_initialized = True
+
+
+_last_updated = datetime.utcnow()
+
+
+def bump_updated():
+    global _last_updated
+    _last_updated = datetime.utcnow()
+
+
+@app.route('/api/updated')
+def api_updated():
+    return jsonify(ts=_last_updated.timestamp())
+
+
+@app.context_processor
+def inject_globals():
+    return dict(last_updated=_last_updated.timestamp())
 
 
 @app.before_request
@@ -151,6 +169,7 @@ def toggle(item_id):
     item.checked = not item.checked
     item.checked_by = session.get('username') if item.checked else None
     db.session.commit()
+    bump_updated()
     return redirect(url_for('index'))
 
 
@@ -196,6 +215,7 @@ def leads():
             item = Model(tool=tool, location=location, where_to_find=where_to_find, quantity=quantity)
             db.session.add(item)
             db.session.commit()
+            bump_updated()
             flash('Item added', 'success')
             return redirect(url_for('leads'))
     items = Item.query.order_by(Item.created_at.desc()).all()
@@ -209,6 +229,7 @@ def leads_reset():
     Item.query.delete()
     Part.query.delete()
     db.session.commit()
+    bump_updated()
     flash('All tools and parts cleared. Usernames preserved.', 'success')
     return redirect(url_for('leads'))
 
