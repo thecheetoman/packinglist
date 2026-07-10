@@ -16,9 +16,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET', 'dev-secret')
 ADMIN_PASSWORD = os.environ.get('CHECKLIST_ADMIN_PW', 'changeme')
+LOG_ON_PASSWORD = os.environ.get('LOG_ON_PASSWORD', 'packing2025')
 
 # IMPORTANT
-LOCATIONS = ['Drawer 1', 'Drawer 2', 'Drawer 3', 'Shelf A', 'Shelf B', 'Cabinet', 'Closet', 'Under Bed', 'Other']
+LOCATIONS = ['Drawer 1', 'Drawer 2', 'Drawer 3']
 
 db = SQLAlchemy(app)
 
@@ -99,8 +100,12 @@ def login_required(f):
 def join():
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
         if not username:
             flash('Username is required', 'error')
+            return render_template('join.html')
+        if password != LOG_ON_PASSWORD:
+            flash('Wrong password', 'error')
             return render_template('join.html')
         user = User.query.filter_by(username=username).first()
         if not user:
@@ -230,7 +235,7 @@ def leads_reset():
     Part.query.delete()
     db.session.commit()
     bump_updated()
-    flash('All tools and parts cleared. Usernames preserved.', 'success')
+    flash('All tools and parts cleared.', 'success')
     return redirect(url_for('leads'))
 
 

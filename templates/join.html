@@ -2,11 +2,15 @@
 {% block content %}
 <div class="form-card">
   <h2>Join</h2>
-  <p>Enter a username to join.</p>
+  <p>Enter the day-of-use password and your username to join.</p>
   <form method="post">
     <div class="form-group">
       <label for="username">Username</label>
-      <input class="form-input" id="username" name="username" required autofocus>
+      <input class="form-input" id="username" name="username" required>
+    </div>
+    <div class="form-group">
+      <label for="password">Access Password(Ask a lead)</label>
+      <input class="form-input" id="password" name="password" type="password" required autofocus>
     </div>
     <div class="form-actions">
       <button type="submit" class="btn btn-yellow">Go</button>
