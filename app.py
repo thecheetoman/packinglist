@@ -1,8 +1,9 @@
 import os
 from datetime import datetime
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, Response
 from flask_sqlalchemy import SQLAlchemy
+from fpdf import FPDF
 from functools import wraps
 
 load_dotenv()
@@ -19,7 +20,7 @@ ADMIN_PASSWORD = os.environ.get('CHECKLIST_ADMIN_PW', 'changeme')
 LOG_ON_PASSWORD = os.environ.get('LOG_ON_PASSWORD', 'packing2025')
 
 # IMPORTANT
-LOCATIONS = ['Drawer 1', 'Drawer 2', 'Drawer 3']
+LOCATIONS = ['Drawer 1', 'Drawer 2', 'Drawer 3', "Shelf A"]
 
 db = SQLAlchemy(app)
 
@@ -226,6 +227,47 @@ def leads():
     items = Item.query.order_by(Item.created_at.desc()).all()
     parts = Part.query.order_by(Part.created_at.desc()).all()
     return render_template('leads.html', items=items, parts=parts, locations=LOCATIONS)
+
+
+@app.route('/leads/export-tools.pdf')
+@admin_required
+def leads_export_tools():
+    items = Item.query.order_by(Item.tool).all()
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font('Helvetica', 'B', 16)
+    pdf.cell(0, 10, 'E Motion Tools and Locations', new_x='LMARGIN', new_y='NEXT', align='C')
+    pdf.ln(8)
+
+    pdf.set_font('Helvetica', 'B', 11)
+    pdf.set_fill_color(220, 220, 220)
+    pdf.cell(90, 8, 'Tool', border=1, fill=True, align='C')
+    pdf.cell(90, 8, 'Location', border=1, fill=True, align='C')
+    pdf.ln()
+
+    pdf.set_font('Helvetica', '', 10)
+    for item in items:
+        loc = item.location or item.where_to_put or ''
+        pdf.cell(90, 7, item.tool, border=1)
+        pdf.cell(90, 7, loc, border=1)
+        pdf.ln()
+
+    return Response(bytes(pdf.output(dest='S')),
+                    mimetype='application/pdf',
+                    headers={'Content-Disposition': 'attachment; filename=toolMap.pdf'})
+
+
+@app.route('/leads/uncheck-parts', methods=['POST'])
+@admin_required
+def leads_uncheck_parts():
+    for p in Part.query.all():
+        p.checked = False
+        p.checked_by = None
+    db.session.commit()
+    bump_updated()
+    flash('All screws &amp; parts unchecked.', 'success')
+    return redirect(url_for('leads'))
 
 
 @app.route('/leads/reset', methods=['POST'])

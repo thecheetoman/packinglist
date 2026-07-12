@@ -70,7 +70,10 @@
   </div>
 
   <div class="lead-list">
-    <h3>Existing Tools</h3>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <h3>Existing Tools</h3>
+      <a href="/leads/export-tools.pdf" class="btn btn-yellow" style="font-size:0.85em;text-decoration:none">Export PDF</a>
+    </div>
     <ul>
       {% for it in items %}
         <li><a href="/item/{{it.id}}">{{it.tool}}</a> — {{it.quantity}} — {% if it.location %}<strong>{{it.location}}</strong>{% endif %} {{it.where_to_put}} — {{it.where_to_find}}</li>
@@ -79,7 +82,12 @@
   </div>
 
   <div class="lead-list">
-    <h3>Existing Screws &amp; Parts</h3>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <h3>Existing Screws &amp; Parts</h3>
+      <form action="/leads/uncheck-parts" method="post" onsubmit="return confirm('Uncheck all screws and parts?')">
+        <button type="submit" class="btn btn-danger" style="font-size:0.85em">Uncheck All Parts</button>
+      </form>
+    </div>
     <ul>
       {% for p in parts %}
         <li><a href="/item/{{p.id}}">{{p.tool}}</a> — {{p.quantity}} — {% if p.location %}<strong>{{p.location}}</strong>{% endif %} {{p.where_to_put}} — {{p.where_to_find}}</li>
