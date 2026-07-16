@@ -237,7 +237,7 @@ def leads_export_tools():
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font('Helvetica', 'B', 16)
-    pdf.cell(0, 10, 'E Motion Tools and Locations', new_x='LMARGIN', new_y='NEXT', align='C')
+    pdf.cell(0, 10, '2658 E-Motion Tools and Locations', align='C')
     pdf.ln(8)
 
     pdf.set_font('Helvetica', 'B', 11)
