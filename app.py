@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, Response
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from fpdf import FPDF
 from functools import wraps
@@ -253,9 +253,13 @@ def leads_export_tools():
         pdf.cell(90, 7, loc, border=1)
         pdf.ln()
 
-    return Response(bytes(pdf.output(dest='S')),
-                    mimetype='application/pdf',
-                    headers={'Content-Disposition': 'attachment; filename=toolMap.pdf'})
+    out = pdf.output(dest='S')
+    if isinstance(out, str):
+        out = out.encode('latin-1')
+    response = make_response(out)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=toolMap.pdf'
+    return response
 
 
 @app.route('/leads/uncheck-parts', methods=['POST'])
