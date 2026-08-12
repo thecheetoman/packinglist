@@ -628,6 +628,12 @@ button:active, .btn:active { transform: scale(0.97); }
   border-bottom: 2px solid var(--yellow-600);
 }
 
+.admin-note {
+  color: var(--neutral-700);
+  font-size: 0.8rem;
+  margin-top: 12px;
+}
+
 @media (min-width: 481px) {
   .admin-card h3 { margin-bottom: 16px; }
 }

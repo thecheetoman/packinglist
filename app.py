@@ -110,9 +110,8 @@ def join():
             return render_template('join.html')
         user = User.query.filter_by(username=username).first()
         if not user:
-            user = User(username=username)
-            db.session.add(user)
-            db.session.commit()
+            flash('Username not found. Ask a lead to create your account.', 'error')
+            return render_template('join.html')
         session['username'] = username
         if not session.get('admin'):
             session['admin'] = False
@@ -210,6 +209,17 @@ def admin_required(f):
 def leads():
     if request.method == 'POST':
         kind = request.form.get('kind', 'tool')
+        if kind == 'user':
+            username = request.form.get('username', '').strip()
+            if not username:
+                flash('Username is required', 'error')
+            elif User.query.filter_by(username=username).first():
+                flash('That username already exists', 'error')
+            else:
+                db.session.add(User(username=username))
+                db.session.commit()
+                flash(f'User {username} created', 'success')
+            return redirect(url_for('leads'))
         tool = request.form.get('tool')
         location = request.form.get('location')
         where_to_find = request.form.get('where_to_find')
@@ -226,7 +236,18 @@ def leads():
             return redirect(url_for('leads'))
     items = Item.query.order_by(Item.created_at.desc()).all()
     parts = Part.query.order_by(Part.created_at.desc()).all()
-    return render_template('leads.html', items=items, parts=parts, locations=LOCATIONS)
+    users = User.query.order_by(User.username.asc()).all()
+    return render_template('leads.html', items=items, parts=parts, users=users, locations=LOCATIONS)
+
+
+@app.route('/leads/users/<int:user_id>/delete', methods=['POST'])
+@admin_required
+def leads_delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    db.session.delete(user)
+    db.session.commit()
+    flash(f'User {user.username} removed', 'success')
+    return redirect(url_for('leads'))
 
 
 @app.route('/leads/export-tools.pdf')
@@ -279,6 +300,7 @@ def leads_uncheck_parts():
 def leads_reset():
     Item.query.delete()
     Part.query.delete()
+    User.query.delete()
     db.session.commit()
     bump_updated()
     flash('All tools and parts cleared.', 'success')

@@ -2,7 +2,7 @@
 {% block content %}
 <div class="form-card">
   <h2>Join</h2>
-  <p>Enter the day-of-use password and your username to join.</p>
+  <p>Enter the access password and your lead provided username to join.</p>
   <form method="post">
     <div class="form-group">
       <label for="username">Username</label>
@@ -16,5 +16,8 @@
       <button type="submit" class="btn btn-yellow">Go</button>
     </div>
   </form>
+  <div style="margin-top:12px;text-align:center">
+    <a href="/leads/login" class="btn" style="text-decoration:none">Open Leads Mode</a>
+  </div>
 </div>
 {% endblock %}

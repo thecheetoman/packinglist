@@ -67,6 +67,35 @@
         </div>
       </form>
     </div>
+
+    <div class="admin-card">
+      <h3>Add User</h3>
+      <form method="post">
+        <input type="hidden" name="kind" value="user">
+        <div class="form-group">
+          <label>Username</label>
+          <input class="form-input" name="username" required>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-yellow">Add User</button>
+        </div>
+      </form>
+      <p class="admin-note">Only users added here can join the site.</p>
+    </div>
+  </div>
+
+  <div class="lead-list">
+    <h3>Registered Users</h3>
+    <ul>
+      {% for u in users %}
+        <li>
+          {{ u.username }}
+          <form action="/leads/users/{{ u.id }}/delete" method="post" style="display:inline" onsubmit="return confirm('Remove {{ u.username }}?')">
+            <button type="submit" class="btn btn-danger" style="font-size:0.75em;padding:2px 8px">Remove</button>
+          </form>
+        </li>
+      {% else %}<li style="color:var(--neutral-700)">No users yet</li>{% endfor %}
+    </ul>
   </div>
 
   <div class="lead-list">
