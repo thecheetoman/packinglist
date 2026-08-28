@@ -20,7 +20,19 @@ ADMIN_PASSWORD = os.environ.get('CHECKLIST_ADMIN_PW', 'changeme')
 LOG_ON_PASSWORD = os.environ.get('LOG_ON_PASSWORD', 'packing2025')
 
 # IMPORTANT
-LOCATIONS = ['Drawer 1', 'Drawer 2', 'Drawer 3', "Shelf A"]
+LOCATIONS = [
+    'Below bits drawer', 
+    'Bits Drawer', 
+    'Bottom drawer', 
+    'Cabinet', 
+    'Clamps drawer', 
+    'Drills', 
+    'Electrical drawer', 
+    'Misc drawer 1', 
+    'Misc drawer 2', 
+    'Scissors and files', 
+    'Top Drawer'
+]
 
 db = SQLAlchemy(app)
 
@@ -300,7 +312,6 @@ def leads_uncheck_parts():
 def leads_reset():
     Item.query.delete()
     Part.query.delete()
-    User.query.delete()
     db.session.commit()
     bump_updated()
     flash('All tools and parts cleared.', 'success')
