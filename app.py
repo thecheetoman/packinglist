@@ -30,7 +30,10 @@ LOCATIONS = [
     'Electrical drawer', 
     'Misc drawer 1', 
     'Misc drawer 2', 
-    'Scissors and files', 
+    'Scissors and files',
+    'Screw Box',
+    'Small Parts Box',
+    'Spare Parts Box',
     'Top Drawer'
 ]
 
