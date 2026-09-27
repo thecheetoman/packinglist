@@ -696,6 +696,87 @@ button:active, .btn:active { transform: scale(0.97); }
 .footer-sub { font-size: 0.75rem; color: var(--neutral-600); }
 @media (min-width: 481px) { .footer-sub { font-size: 0.8rem; } }
 
+.install-btn {
+  width: var(--touch-min);
+  min-width: var(--touch-min);
+  height: var(--touch-min);
+  padding: 0;
+  background: transparent;
+  color: var(--yellow-400);
+  border: 1px solid var(--yellow-600);
+  border-radius: var(--radius-sm);
+}
+
+.install-btn:hover { background: var(--yellow-900); opacity: 1; color: var(--yellow-500); }
+.install-btn[hidden] { display: none; }
+
+@media (max-width: 480px) {
+  .install-btn { width: 40px; min-width: 40px; height: 40px; }
+}
+
+.ios-shortcut {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  margin-top: 24px;
+  background: var(--midnight);
+  border-top: 2px solid var(--yellow-600);
+  padding: 12px 0;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+}
+
+.ios-shortcut[hidden] { display: none; }
+
+.ios-shortcut .container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--yellow-500);
+  font-weight: 600;
+  font-size: 0.9rem;
+  min-height: var(--touch-min);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-hint {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.ios-hint[hidden] { display: none; }
+
+.ios-hint-box {
+  width: 100%;
+  max-width: 420px;
+  background: var(--midnight);
+  border: 1px solid var(--yellow-600);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.ios-hint-box p { color: var(--yellow-100); font-size: 0.9rem; }
+.ios-hint-box strong { color: var(--yellow-500); }
+
+.ios-hint-dismiss {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.7rem;
+  color: var(--neutral-600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 @media (max-width: 480px) {
   .navbar { flex-direction: column; gap: 6px; padding: 10px 0; }
   .navbar-right { gap: 6px; width: 100%; }

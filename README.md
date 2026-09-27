@@ -35,6 +35,24 @@ Open http://localhost:5000 in your browser. You'll be prompted to enter a userna
 - Visit a leads page to add and remove items
 - Clear database
 
+## Installing as an App
+
+The site is a PWA, so it can be added to a phone or computer home screen/desktop and
+launches full screen with no browser address bar.
+
+- Android / Chrome / Edge / desktop Chrome: tap the install button in the navbar
+  (it only shows up when the browser actually offers the install prompt)
+- iPhone / iPad Safari: tap the **Add Shortcut** bar at the bottom of the page, then
+  follow the Share -> Add to Home Screen instructions
+
+Notes:
+- The install prompt requires HTTPS (or `localhost`). On a plain-HTTP LAN address the
+  navbar button will never appear, so deploy behind HTTPS if you want installs.
+- Set `"display": "fullscreen"` in `static/manifest.json` instead of `"standalone"` if
+  you also want the phone status bar hidden.
+- Icons live in `static/icons/` and are generated from `static/favicon.ico`
+  (black background, yellow art). Replace those PNGs to change the app icon.
+
 ## Adding Location Pictures
 
 Each item has a Where to put field that shows a picture on the detail page.
