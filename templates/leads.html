@@ -94,7 +94,7 @@
             <button type="submit" class="btn btn-danger" style="font-size:0.75em;padding:2px 8px">Remove</button>
           </form>
         </li>
-      {% else %}<li style="color:var(--neutral-700)">No users yet</li>{% endfor %}
+      {% else %}<li style="color:var(--neutral-600)">No users yet</li>{% endfor %}
     </ul>
   </div>
 
@@ -105,8 +105,16 @@
     </div>
     <ul>
       {% for it in items %}
-        <li><a href="/item/{{it.id}}">{{it.tool}}</a> — {{it.quantity}} — {% if it.location %}<strong>{{it.location}}</strong>{% endif %} {{it.where_to_put}} — {{it.where_to_find}}</li>
-      {% else %}<li style="color:var(--neutral-700)">No tools</li>{% endfor %}
+        <li>
+          <a href="/item/{{it.id}}">{{it.tool}}</a> — {{it.quantity}} — {% if it.location %}<strong>{{it.location}}</strong>{% endif %} {{it.where_to_put}} — {{it.where_to_find}}
+          <div style="display:inline">
+            <a href="/leads/tools/{{it.id}}/edit" class="btn btn-yellow" style="font-size:0.75em;padding:2px 8px;text-decoration:none">Edit</a>
+            <form action="/leads/tools/{{it.id}}/delete" method="post" style="display:inline" onsubmit="return confirm('Delete {{it.tool}}?')">
+              <button type="submit" class="btn btn-danger" style="font-size:0.75em;padding:2px 8px">Delete</button>
+            </form>
+          </div>
+        </li>
+      {% else %}<li style="color:var(--neutral-600)">No tools</li>{% endfor %}
     </ul>
   </div>
 
@@ -119,8 +127,16 @@
     </div>
     <ul>
       {% for p in parts %}
-        <li><a href="/item/{{p.id}}">{{p.tool}}</a> — {{p.quantity}} — {% if p.location %}<strong>{{p.location}}</strong>{% endif %} {{p.where_to_put}} — {{p.where_to_find}}</li>
-      {% else %}<li style="color:var(--neutral-700)">No parts</li>{% endfor %}
+        <li>
+          <a href="/item/{{p.id}}">{{p.tool}}</a> — {{p.quantity}} — {% if p.location %}<strong>{{p.location}}</strong>{% endif %} {{p.where_to_put}} — {{p.where_to_find}}
+          <div style="display:inline">
+            <a href="/leads/parts/{{p.id}}/edit" class="btn btn-yellow" style="font-size:0.75em;padding:2px 8px;text-decoration:none">Edit</a>
+            <form action="/leads/parts/{{p.id}}/delete" method="post" style="display:inline" onsubmit="return confirm('Delete {{p.tool}}?')">
+              <button type="submit" class="btn btn-danger" style="font-size:0.75em;padding:2px 8px">Delete</button>
+            </form>
+          </div>
+        </li>
+      {% else %}<li style="color:var(--neutral-600)">No parts</li>{% endfor %}
     </ul>
   </div>
 </div>

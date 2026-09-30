@@ -662,7 +662,7 @@ button:active, .btn:active { transform: scale(0.97); }
   padding: 12px 14px;
   border-radius: var(--radius-sm);
   font-size: 0.8rem;
-  color: var(--neutral-600);
+  color: #e6e6e6;
   transition: var(--transition);
   line-height: 1.5;
   word-break: break-word;
@@ -674,6 +674,7 @@ button:active, .btn:active { transform: scale(0.97); }
 
 .lead-list li a { color: var(--yellow-400); font-weight: 600; }
 .lead-list li a:hover { opacity: 0.5; }
+.lead-list li a.btn-yellow { color: #000; }
 .lead-list li strong { color: var(--yellow-500); }
 
 .footer {

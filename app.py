@@ -298,6 +298,50 @@ def leads_export_tools():
     return response
 
 
+def _find_item(item_id, kind):
+    Model = Part if kind == 'part' else Item
+    item = Model.query.get_or_404(item_id)
+    return item
+
+
+@app.route('/leads/tools/<int:item_id>/edit', methods=['GET', 'POST'])
+@app.route('/leads/parts/<int:item_id>/edit', methods=['GET', 'POST'])
+@admin_required
+def leads_edit(item_id):
+    kind = 'part' if request.path.startswith('/leads/parts/') else 'tool'
+    item = _find_item(item_id, kind)
+    if request.method == 'POST':
+        tool = request.form.get('tool')
+        location = request.form.get('location')
+        where_to_find = request.form.get('where_to_find')
+        quantity = request.form.get('quantity')
+        if not tool:
+            flash('Name is required', 'error')
+            return render_template('leads_edit.html', item=item, kind=kind, locations=LOCATIONS)
+        item.tool = tool
+        item.location = location
+        item.where_to_find = where_to_find
+        item.quantity = quantity
+        db.session.commit()
+        bump_updated()
+        flash('Item updated', 'success')
+        return redirect(url_for('leads'))
+    return render_template('leads_edit.html', item=item, kind=kind, locations=LOCATIONS)
+
+
+@app.route('/leads/tools/<int:item_id>/delete', methods=['POST'])
+@app.route('/leads/parts/<int:item_id>/delete', methods=['POST'])
+@admin_required
+def leads_delete(item_id):
+    kind = 'part' if request.path.startswith('/leads/parts/') else 'tool'
+    item = _find_item(item_id, kind)
+    db.session.delete(item)
+    db.session.commit()
+    bump_updated()
+    flash('Item removed', 'success')
+    return redirect(url_for('leads'))
+
+
 @app.route('/leads/uncheck-parts', methods=['POST'])
 @admin_required
 def leads_uncheck_parts():
