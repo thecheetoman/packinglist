@@ -3,6 +3,27 @@
 <div class="admin-page">
   <h2>Leads</h2>
 
+  <div class="admin-card progress-card">
+    <h3>Packing Progress</h3>
+    {% if progress.overall.total == 0 %}
+      <p class="admin-note">No items yet — add tools and parts below.</p>
+    {% else %}
+      <div class="progress-rows">
+        {% for label, key in (('Tools', 'tools'), ('Parts', 'parts'), ('Overall', 'overall')) %}
+        <div class="progress-row">
+          <div class="progress-meta">
+            <span class="progress-label">{{ label }}</span>
+            <span class="progress-count">{{ progress[key].checked }}/{{ progress[key].total }} &middot; {{ progress[key].pct }}%</span>
+          </div>
+          <div class="progress-track" role="progressbar" aria-valuenow="{{ progress[key].pct }}" aria-valuemin="0" aria-valuemax="100" aria-label="{{ label }} packed">
+            <div class="progress-fill" style="width: {{ progress[key].pct }}%"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
   <div class="admin-toolbar">
     <form action="/leads/reset" method="post" onsubmit="return confirm('Delete all tools and parts?')">
       <button type="submit" class="btn btn-danger">Reset All Data</button>

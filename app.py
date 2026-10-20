@@ -219,6 +219,31 @@ def admin_required(f):
     return wrapper
 
 
+def _pct(checked, total):
+    return round(100 * checked / total) if total else 0
+
+
+def _packing_progress():
+    def bucket(Model):
+        total = Model.query.count()
+        checked = Model.query.filter_by(checked=True).count()
+        return {'total': total, 'checked': checked, 'pct': _pct(checked, total)}
+
+    tools = bucket(Item)
+    parts = bucket(Part)
+    overall_checked = tools['checked'] + parts['checked']
+    overall_total = tools['total'] + parts['total']
+    return {
+        'tools': tools,
+        'parts': parts,
+        'overall': {
+            'total': overall_total,
+            'checked': overall_checked,
+            'pct': _pct(overall_checked, overall_total),
+        },
+    }
+
+
 @app.route('/leads', methods=['GET', 'POST'])
 @admin_required
 def leads():
@@ -252,7 +277,9 @@ def leads():
     items = Item.query.order_by(Item.created_at.desc()).all()
     parts = Part.query.order_by(Part.created_at.desc()).all()
     users = User.query.order_by(User.username.asc()).all()
-    return render_template('leads.html', items=items, parts=parts, users=users, locations=LOCATIONS)
+    progress = _packing_progress()
+    return render_template('leads.html', items=items, parts=parts, users=users,
+                           locations=LOCATIONS, progress=progress)
 
 
 @app.route('/leads/users/<int:user_id>/delete', methods=['POST'])

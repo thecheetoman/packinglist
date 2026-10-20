@@ -12,15 +12,19 @@ Compress PNG images for low-bandwidth use.
 Usage:
     pip install pillow
     python compress_pngs.py INPUT_DIR OUTPUT_DIR [--max-dim 1600] [--colors 256] [--no-quantize]
+    python compress_pngs.py INPUT_DIR --in-place [--max-dim 1600] [--colors 256]
 
 Examples:
     python compress_pngs.py ./photos ./photos_compressed
     python compress_pngs.py ./photos ./photos_compressed --max-dim 1200 --colors 128
     python compress_pngs.py ./photos ./photos_compressed --no-quantize   # keep full color, just resize+optimize
+    python compress_pngs.py ./photos --in-place                           # overwrite originals (same names)
 """
 
 import argparse
+import os
 import sys
+import tempfile
 from pathlib import Path
 
 from PIL import Image
@@ -62,20 +66,31 @@ def compress_png(src_path: Path, dst_path: Path, max_dim: int, colors: int, quan
 def main():
     parser = argparse.ArgumentParser(description="Compress PNG images for low-bandwidth web use.")
     parser.add_argument("input_dir", type=Path, help="Folder containing source .png images")
-    parser.add_argument("output_dir", type=Path, help="Folder to write compressed .png images")
+    parser.add_argument("output_dir", type=Path, nargs="?", help="Folder to write compressed .png images")
+    parser.add_argument("--in-place", action="store_true",
+                        help="Overwrite the original files, keeping their names (ignores output_dir)")
     parser.add_argument("--max-dim", type=int, default=1600,
-                         help="Max width/height in pixels (default: 1600)")
+                        help="Max width/height in pixels (default: 1600)")
     parser.add_argument("--colors", type=int, default=256,
-                         help="Max palette colors when quantizing (default: 256, min useful ~64)")
+                        help="Max palette colors when quantizing (default: 256, min useful ~64)")
     parser.add_argument("--no-quantize", action="store_true",
-                         help="Skip color quantization, only resize + optimize")
+                        help="Skip color quantization, only resize + optimize")
     args = parser.parse_args()
 
     if not args.input_dir.is_dir():
         print(f"Input directory not found: {args.input_dir}", file=sys.stderr)
         sys.exit(1)
 
-    png_files = sorted(args.input_dir.glob("*.png")) + sorted(args.input_dir.glob("*.PNG"))
+    if args.in_place and args.output_dir:
+        parser.error("give either output_dir or --in-place, not both")
+    if not args.in_place and not args.output_dir:
+        parser.error("output_dir is required unless --in-place is used")
+    if not args.in_place:
+        args.output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Case-insensitive filesystems (e.g. Windows) make *.png also match *.PNG,
+    # so dedupe to avoid processing every file twice.
+    png_files = sorted(set(args.input_dir.glob("*.png")) | set(args.input_dir.glob("*.PNG")))
     if not png_files:
         print(f"No .png files found in {args.input_dir}")
         sys.exit(0)
@@ -84,11 +99,24 @@ def main():
     total_after = 0
 
     for src in png_files:
-        dst = args.output_dir / src.name
         before = src.stat().st_size
+        tmp_path = None
+        dst = src if args.in_place else args.output_dir / src.name
         try:
-            compress_png(src, dst, args.max_dim, args.colors, quantize=not args.no_quantize)
+            if args.in_place:
+                # Compress to a temp file first, then swap it in only on success
+                # so a failure never destroys the original.
+                fd, tmp_name = tempfile.mkstemp(suffix=".png", dir=src.parent)
+                os.close(fd)
+                tmp_path = Path(tmp_name)
+                compress_png(src, tmp_path, args.max_dim, args.colors, quantize=not args.no_quantize)
+                os.replace(tmp_path, src)
+                tmp_path = None
+            else:
+                compress_png(src, dst, args.max_dim, args.colors, quantize=not args.no_quantize)
         except Exception as e:
+            if tmp_path is not None:
+                tmp_path.unlink(missing_ok=True)
             print(f"  FAILED: {src.name} -> {e}")
             continue
         after = dst.stat().st_size
